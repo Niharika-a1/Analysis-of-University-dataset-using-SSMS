@@ -26,7 +26,7 @@ FROM courses WHERE CourseID IN (
                               SELECT CourseID FROM facultyassignments 
 							  WHERE FacultyID IN (
 	                          SELECT FacultyID FROM facultymembers 
-										       WHERE academictitle = 'Associate Professor'));
+							  WHERE academictitle = 'Associate Professor'));
 
 # Find the total no. of students in each grade.
 SELECT Grade, COUNT(*) AS num_students
