@@ -1,3 +1,62 @@
+# What is the mean amount of payments made for every payment status listed in the 'payments' table, and which statuses have an average payment over $500?
+SELECT paymentstatus,AVG(amount) AS average_payment_amount
+FROM 
+PaymentsAndTuition
+GROUP BY
+    paymentstatus
+HAVING
+   AVG(amount) > 500;
+
+# Query  to display the first name and last name of a student who didn't paid the tuition fees?
+SELECT fname, lname
+FROM Students
+WHERE studentid NOT IN (
+                        SELECT studentid FROM Payment WHERE paymentstatus = 'Paid');
+
+# Find the average payment amount made by students in Master of Science program.
+SELECT program, AVG(amount) AS average_payment
+FROM students s
+INNER JOIN PaymentsAndTuition p ON s.StudentID = p.StudentID
+WHERE program = 'Master of Science'
+GROUP BY program;
+
+# Find the total number of enrollments for each course.
+SELECT CourseID, name, description
+FROM courses WHERE CourseID IN (     
+                              SELECT CourseID FROM facultyassignments 
+							  WHERE FacultyID IN (
+	                          SELECT FacultyID FROM facultymembers 
+										       WHERE academictitle = 'Associate Professor'));
+
+# Find the total no. of students in each grade.
+SELECT Grade, COUNT(*) AS num_students
+FROM Students S
+INNER JOIN GradesAndTranscripts G 
+ON S.StudentID = G.studentID
+GROUP BY G.grade;
+
+# Find the number of enrollments made by each student.
+SELECT S.StudentID, S.firstname, S.lastname, COUNT(E.EnrollmentID) AS num_enrollments
+FROM Students S
+LEFT JOIN Enrollments E 
+ON S.StudentID = E.StudentID
+GROUP BY S.StudentID, S.firstname, S.lastname;
+
+# Query to retrieve courses names taught by Computer Information Systems faculty who live in Regent.
+--Explicit join
+SELECT C.CourseID,C.name AS course_name
+FROM courses C
+LEFT JOIN FacultyAssignments A ON C.CourseID = A.CourseID
+LEFT JOIN FacultyMembers M ON A.FacultyID = M.FacultyID
+LEFT JOIN AcademicDepartments D ON M.DepartmentID = D.DepartmentID
+WHERE D.Name = 'Computer Information Systems'
+AND M.Address LIKE '%Regent%';
+--Implicit join
+SELECT C.CourseID,C.name AS course_name
+FROM courses C, FacultyAssignments A, FacultyMembers M , AcademicDepartments D
+WHERE C.CourseID = A.CourseID AND A.FacultyID = M.FacultyID AND M.DepartmentID = D.DepartmentID
+AND D.Name = 'Computer Information Systems' AND M.Address LIKE '%Regent%';
+
 # Give top 5 female students having 'B' grade and payment amount greater than 5000.
 --Explicit join
 SELECT TOP 5 s.StudentID, s.firstname, s.lastname, s.gender, g.grade, p.amount
@@ -14,7 +73,7 @@ FROM GradesAndTranscripts g, students s, PaymentsAndTuition p
 WHERE s.StudentID = g.StudentID AND s.StudentID = p.StudentID AND s.gender = 'Female' AND g.grade = 'B' AND p.amount > 5000
 ORDER BY p.amount DESC;
 
-# Write a query to display faculty names with program, department and assigned courses.
+# Query to display faculty names with program, department and assigned courses.
 --Explicit join
 SELECT FM.FirstName, FM.LastName, C.CourseID, FA.Status, P.Name AS Program_name, D.Name AS Department_name
 FROM AcademicDepartments D INNER JOIN FacultyMembers FM ON FM.DepartmentID = D.DepartmentID
