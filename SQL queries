@@ -1,0 +1,28 @@
+# Give top 5 female students having 'B' grade and payment amount greater than 5000.
+--Explicit join
+SELECT TOP 5 s.StudentID, s.firstname, s.lastname, s.gender, g.grade, p.amount
+FROM students s
+JOIN GradesAndTranscripts g ON s.StudentID = g.StudentID
+JOIN PaymentsAndTuition p ON s.StudentID = p.StudentID
+WHERE s.gender = 'Female' 
+AND g.grade = 'B' 
+AND p.amount > 5000
+ORDER BY p.amount DESC;
+--Implicit join
+SELECT TOP 5 s.StudentID, s.firstname, s.lastname, s.gender, g.grade, p.amount
+FROM GradesAndTranscripts g, students s, PaymentsAndTuition p
+WHERE s.StudentID = g.StudentID AND s.StudentID = p.StudentID AND s.gender = 'Female' AND g.grade = 'B' AND p.amount > 5000
+ORDER BY p.amount DESC;
+
+# Write a query to display faculty names with program, department and assigned courses.
+--Explicit join
+SELECT FM.FirstName, FM.LastName, C.CourseID, FA.Status, P.Name AS Program_name, D.Name AS Department_name
+FROM AcademicDepartments D INNER JOIN FacultyMembers FM ON FM.DepartmentID = D.DepartmentID
+    INNER JOIN FacultyAssignments FA ON FA.FacultyID = FM.FacultyID
+    INNER JOIN Courses C ON FA.CourseID = C.CourseID
+    INNER JOIN Programs P ON C.ProgramID = P.ProgramID
+WHERE FA.Status = 'Assigned';
+--Implicit join
+SELECT FM.FirstName, FM.LastName, C.CourseID, FA.Status, P.Name AS Program_name, D.Name AS Department_name
+FROM AcademicDepartments D, FacultyMembers FM, FacultyAssignments FA, Courses C, Programs P
+WHERE FM.DepartmentID = D.DepartmentID AND FA.FacultyID = FM.FacultyID AND FA.CourseID = C.CourseID AND C.ProgramID = P.ProgramID AND FA.Status = 'Assigned';
